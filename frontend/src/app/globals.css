@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-montserrat: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-slate-800;
+  }
+}
+
+@layer components {
+  .prob-card {
+    @apply bg-white border border-slate-200 rounded-xl p-8 relative overflow-hidden transition-all duration-300;
+  }
+  .prob-card:hover {
+    @apply shadow-[0_12px_36px_rgba(0,0,0,0.07)] -translate-y-1 border-blue-200;
+  }
+}
