@@ -74,7 +74,7 @@ The user interface will be accessible at `http://localhost:3000`.
 
 ## Model Training
 
-To train the acoustic forensic model or experiment with the architecture, place your Jupyter Notebook (`.ipynb`) in the `notebooks/` directory. Upload this notebook to Google Colab for training using GPU acceleration. After completing the training process, download the resulting `.keras` file and place it in the `backend/model/` directory.
+The code used to train the acoustic forensic model is located in the `notebooks/` directory. You can upload the Jupyter Notebook (`.ipynb`) found inside this folder directly to Google Colab to train the model using GPU acceleration. After completing the training process, download the resulting `.keras` file and place it in the `backend/model/` directory.
 
 ## Limitations and Scope
 
