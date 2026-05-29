@@ -2,7 +2,7 @@
 
 ## Overview
 
-VoiceGuard is an advanced, automated acoustic forensics system designed to detect synthetic audio and voice cloning. Utilizing a deep learning architecture, specifically a Light Convolutional Neural Network (LCNN), the system analyzes acoustic fingerprints to differentiate between authentic human voices and AI-generated speech (Text-to-Speech).
+VoiceGuard is an advanced, automated acoustic forensics system designed to detect synthetic audio and voice cloning. Utilizing a deep learning architecture, specifically a Convolutional Neural Network (CNN), the system analyzes acoustic fingerprints to differentiate between authentic human voices and AI-generated speech (Text-to-Speech).
 
 The architecture is fully decoupled, consisting of a high-performance Python FastAPI backend for model inference and a modern Next.js frontend for the user interface.
 
