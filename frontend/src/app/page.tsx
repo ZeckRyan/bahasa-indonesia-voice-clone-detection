@@ -1,15 +1,30 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { useInView } from "./hooks/useInView";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [heroLoaded, setHeroLoaded] = useState(false);
 
   const analyzeRef = useRef<HTMLDivElement>(null);
+  const { ref: whyRef, isVisible: whyVisible } = useInView();
+  const { ref: howRef, isVisible: howVisible } = useInView();
+  const { ref: uploadRef, isVisible: uploadVisible } = useInView({ threshold: 0.1 });
+  const { ref: disclaimerRef, isVisible: disclaimerVisible } = useInView({ threshold: 0.2 });
+  const { ref: footerRef, isVisible: footerVisible } = useInView({ threshold: 0.1 });
+
+  // Trigger hero entrance animation after mount
+  useEffect(() => {
+    const t = setTimeout(() => setHeroLoaded(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -28,7 +43,7 @@ export default function Home() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8000/api/analyze", {
+      const res = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: "POST",
         body: formData,
       });
@@ -66,8 +81,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#04081833] via-[#040818ad] to-[#040818fa]" />
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8 flex justify-center text-center">
-          <div className="max-w-3xl pt-10 flex flex-col items-center">
-            <div className="flex items-center justify-center gap-4 mb-6">
+          <div className={`max-w-3xl pt-10 flex flex-col items-center ${heroLoaded ? "hero-loaded" : ""}`}>
+            <div className="hero-enter hero-enter-delay-1 flex items-center justify-center gap-4 mb-6">
               <div className="w-8 h-[2px] bg-blue-300/70 rounded-full hidden sm:block"></div>
               <span className="font-montserrat text-[0.7rem] font-bold tracking-[0.28em] uppercase text-blue-200/90">
                 Forensik Akustik Berbasis Kecerdasan Buatan
@@ -75,85 +90,134 @@ export default function Home() {
               <div className="w-8 h-[2px] bg-blue-300/70 rounded-full hidden sm:block"></div>
             </div>
             
-            <h1 className="font-sans text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.1] tracking-tight text-white drop-shadow-2xl mb-6">
+            <h1 className="hero-enter hero-enter-delay-2 font-sans text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold leading-[1.1] tracking-tight text-white mb-6">
               AI Deteksi Voice Cloning & Deepfake Bahasa Indonesia
             </h1>
             
-            <p className="text-[1rem] font-light leading-relaxed text-slate-300 mb-10 max-w-2xl mx-auto">
+            <p className="hero-enter hero-enter-delay-3 text-[1rem] font-light leading-relaxed text-slate-300 mb-10 max-w-2xl mx-auto">
               Analisis keaslian rekaman suara secara instan. Sistem AI kami mengidentifikasi 
               jejak forensik akustik dari algoritma Text-to-Speech untuk membedakan suara manusia asli dan sintetik.
             </p>
             
             <button 
               onClick={scrollToAnalyze}
-              className="inline-block px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-montserrat text-sm font-bold tracking-[0.1em] uppercase rounded-lg shadow-[0_6px_28px_rgba(37,99,235,0.45)] hover:shadow-[0_10px_36px_rgba(37,99,235,0.58)] hover:-translate-y-1 transition-all duration-300"
+              className="hero-enter hero-enter-delay-4 inline-block px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-montserrat text-sm font-bold tracking-[0.1em] uppercase rounded-lg shadow-[0_6px_28px_rgba(37,99,235,0.45)] hover:shadow-[0_10px_36px_rgba(37,99,235,0.58)] hover:-translate-y-1 transition-all duration-300"
             >
               Mulai Analisis Audio
             </button>
           </div>
         </div>
 
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center flex flex-col items-center">
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center">
           <div className="w-[1px] h-[40px] bg-white/20 mb-3"></div>
-          <span className="font-montserrat text-[0.65rem] tracking-[0.26em] uppercase text-white/30">
-            Gulir ke Bawah
-          </span>
+          <svg
+            className="w-5 h-5 text-white/30 animate-bounce"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </div>
       </section>
 
       {/* ─────────────────────────────────────────
       SECTION 2 — THE PROBLEM
       ───────────────────────────────────────── */}
-      <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-[2px] bg-blue-600 rounded-full"></div>
-          <span className="font-montserrat text-xs font-bold tracking-[0.22em] uppercase text-blue-600">
-            Mengapa Ini Penting
-          </span>
-        </div>
-        <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-          Ancaman Nyata di Balik Suara Digital
-        </h2>
-        <p className="text-slate-500 max-w-3xl leading-relaxed mb-16">
-          Teknologi Voice Cloning telah berkembang pesat. Suara sintetik yang dihasilkan kini hampir
-          tidak dapat dibedakan oleh telinga manusia biasa, menciptakan risiko serius di berbagai bidang kehidupan.
-        </p>
+      <section ref={whyRef as React.RefObject<HTMLDivElement>} className="py-24 px-6 lg:px-8 max-w-7xl mx-auto">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="prob-card before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-red-500 before:to-orange-500">
-            <span className="font-montserrat text-5xl font-black text-slate-100 block mb-6">01</span>
-            <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">Penipuan Finansial</h3>
-            <p className="text-sm text-slate-500 leading-relaxed mb-6">
-              Pelaku kejahatan menggunakan kloning suara anggota keluarga atau eksekutif perusahaan
-              untuk meyakinkan korban agar melakukan transfer dana dalam jumlah besar.
-            </p>
-            <span className="inline-block px-4 py-1.5 bg-red-50 text-red-700 font-montserrat text-[0.7rem] font-bold uppercase tracking-wider rounded-full">
+        {/* Section header */}
+        <div className={`reveal reveal-fade ${whyVisible ? "reveal-visible" : ""} mb-16`}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-[2px] bg-blue-600 rounded-full" />
+            <span className="font-montserrat text-xs font-bold tracking-[0.22em] uppercase text-blue-600">
+              Mengapa Ini Penting
+            </span>
+          </div>
+          <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+            Ancaman Nyata di Balik Suara Digital
+          </h2>
+          <p className="text-slate-500 max-w-2xl leading-relaxed text-[0.95rem]">
+            Teknologi Voice Cloning telah berkembang pesat. Suara sintetik yang dihasilkan kini hampir
+            tidak dapat dibedakan oleh telinga manusia biasa, menciptakan risiko serius di berbagai bidang.
+          </p>
+        </div>
+
+        {/* Row 1: Dominant card + stat callout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+
+          {/* Dominant card — col-span-7 */}
+          <div className={`reveal ${whyVisible ? "reveal-visible" : ""} reveal-delay-1
+            lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-10
+            relative overflow-hidden group hover:border-blue-200 hover:shadow-lg transition-all duration-300`}>
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-red-500 to-orange-400" />
+            <span className="font-montserrat text-[0.65rem] font-bold tracking-[0.22em] uppercase
+              text-red-600 bg-red-50 px-3 py-1 rounded-full inline-block mb-6">
               Ancaman Kriminal
             </span>
-          </div>
-          
-          <div className="prob-card before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-amber-500 before:to-yellow-500">
-            <span className="font-montserrat text-5xl font-black text-slate-100 block mb-6">02</span>
-            <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">Penyebaran Disinformasi</h3>
-            <p className="text-sm text-slate-500 leading-relaxed mb-6">
-              Tokoh publik sering menjadi korban manipulasi audio deepfake untuk
-              menggiring opini publik, merusak reputasi, atau memprovokasi perpecahan.
+            <h3 className="font-montserrat text-2xl font-extrabold text-slate-900 mb-4 leading-tight">
+              Penipuan Finansial Berbasis Kloning Suara
+            </h3>
+            <p className="text-slate-500 leading-relaxed text-sm">
+              Pelaku kejahatan menggunakan kloning suara anggota keluarga atau eksekutif perusahaan
+              untuk meyakinkan korban agar melakukan transfer dana dalam jumlah besar.
+              Serangan ini sulit dideteksi karena suara yang dihasilkan terdengar identik dengan aslinya.
             </p>
-            <span className="inline-block px-4 py-1.5 bg-amber-50 text-amber-800 font-montserrat text-[0.7rem] font-bold uppercase tracking-wider rounded-full">
-              Ancaman Demokrasi
-            </span>
           </div>
 
-          <div className="prob-card before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-blue-600 before:to-cyan-500">
-            <span className="font-montserrat text-5xl font-black text-slate-100 block mb-6">03</span>
-            <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">Keterbatasan Manusia</h3>
-            <p className="text-sm text-slate-500 leading-relaxed mb-6">
-              Algoritma Text-to-Speech menghasilkan suara sintetik berkualitas tinggi
-              yang tidak lagi dapat dibedakan secara auditif. Diperlukan AI untuk mendeteksinya.
+          {/* Stat callout — col-span-5 */}
+          <div className={`reveal ${whyVisible ? "reveal-visible" : ""} reveal-delay-2
+            lg:col-span-5 bg-[#08101e] rounded-2xl p-10 flex flex-col justify-center`}>
+            <div className="font-montserrat text-[0.65rem] font-bold tracking-[0.22em] uppercase
+              text-blue-400 mb-4">
+              Skala Ancaman Global
+            </div>
+            <div className="font-montserrat text-5xl font-black text-white leading-none mb-3">
+              $25 M
+            </div>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Kerugian akibat penipuan berbasis kloning suara yang dilaporkan dalam satu insiden
+              tunggal pada 2024 — angka yang terus meningkat setiap tahunnya.
             </p>
-            <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-700 font-montserrat text-[0.7rem] font-bold uppercase tracking-wider rounded-full">
+          </div>
+        </div>
+
+        {/* Row 2: Two compact cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className={`reveal ${whyVisible ? "reveal-visible" : ""} reveal-delay-2
+            bg-white border border-slate-200 rounded-2xl p-8
+            relative overflow-hidden hover:border-blue-200 hover:shadow-lg transition-all duration-300`}>
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 to-yellow-400" />
+            <span className="font-montserrat text-[0.65rem] font-bold tracking-[0.22em] uppercase
+              text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block mb-5">
+              Ancaman Demokrasi
+            </span>
+            <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">
+              Penyebaran Disinformasi
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              Tokoh publik sering menjadi korban manipulasi audio deepfake untuk menggiring opini publik,
+              merusak reputasi, atau memprovokasi perpecahan sosial.
+            </p>
+          </div>
+
+          <div className={`reveal ${whyVisible ? "reveal-visible" : ""} reveal-delay-3
+            bg-white border border-slate-200 rounded-2xl p-8
+            relative overflow-hidden hover:border-blue-200 hover:shadow-lg transition-all duration-300`}>
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-blue-600 to-cyan-400" />
+            <span className="font-montserrat text-[0.65rem] font-bold tracking-[0.22em] uppercase
+              text-blue-700 bg-blue-50 px-3 py-1 rounded-full inline-block mb-5">
               Solusi Teknologi
             </span>
+            <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">
+              Keterbatasan Persepsi Manusia
+            </h3>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              Algoritma TTS modern menghasilkan suara berkualitas tinggi yang tidak lagi dapat dibedakan
+              secara auditif. Diperlukan AI forensik untuk mendeteksinya secara andal.
+            </p>
           </div>
         </div>
       </section>
@@ -162,51 +226,112 @@ export default function Home() {
       SECTION 3 — HOW IT WORKS
       ───────────────────────────────────────── */}
       <section className="py-24 bg-white border-y border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-[2px] bg-blue-600 rounded-full"></div>
-            <span className="font-montserrat text-xs font-bold tracking-[0.22em] uppercase text-blue-600">
-              Cara Kerja Sistem
-            </span>
+        <div ref={howRef as React.RefObject<HTMLDivElement>} className="max-w-7xl mx-auto px-6 lg:px-8">
+
+          {/* Section header */}
+          <div className={`reveal reveal-fade ${howVisible ? "reveal-visible" : ""} mb-20`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-[2px] bg-blue-600 rounded-full" />
+              <span className="font-montserrat text-xs font-bold tracking-[0.22em] uppercase text-blue-600">
+                Cara Kerja Sistem
+              </span>
+            </div>
+            <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+              Tiga Tahap Analisis Forensik
+            </h2>
+            <p className="text-slate-500 max-w-2xl leading-relaxed text-[0.95rem]">
+              Proses analisis berlangsung sepenuhnya otomatis melalui tiga tahap yang menggabungkan
+              pemrosesan sinyal suara dan algoritma Deep Learning tingkat lanjut.
+            </p>
           </div>
-          <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-            Tiga Tahap Analisis Forensik
-          </h2>
-          <p className="text-slate-500 max-w-3xl leading-relaxed mb-20">
-            Proses analisis berlangsung sepenuhnya otomatis melalui tiga tahap yang menggabungkan
-            teknik pemrosesan sinyal suara mutakhir dan algoritma Deep Learning tingkat lanjut.
-          </p>
 
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
-            {/* Connection Line (Hidden on Mobile) */}
-            <div className="hidden md:block absolute top-[25px] left-[16.6%] right-[16.6%] h-[2px] bg-gradient-to-r from-blue-200 via-cyan-200 to-indigo-200 z-0"></div>
+          {/* Two-column: steps left, image right */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-end">
 
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="w-14 h-14 bg-blue-600 text-white font-montserrat text-xl font-black rounded-full flex items-center justify-center mb-6 shadow-lg shadow-blue-600/30">1</div>
-              <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">Unggah Audio</h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-5">
-                Masukkan file rekaman suara. Sistem menerima berbagai durasi tanpa batasan panjang.
-              </p>
-              <code className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded">.wav / .mp3 / .ogg</code>
+            {/* Left — steps */}
+            <div className="lg:col-span-2">
+              {[
+                {
+                  num: "01",
+                  title: "Unggah Audio",
+                  body: "Masukkan file rekaman suara. Sistem menerima berbagai format dan durasi tanpa batasan panjang rekaman.",
+                  tag: ".wav / .mp3 / .ogg",
+                  delay: "reveal-delay-1",
+                },
+                {
+                  num: "02",
+                  title: "Ekstraksi Sidik Jari Akustik",
+                  body: "Sistem menghilangkan jeda hening pada rekaman, lalu memindai spektrum frekuensi untuk mengekstrak representasi MFCC — sidik jari akustik yang unik untuk setiap sumber suara.",
+                  tag: "Pemrosesan Sinyal Suara",
+                  delay: "reveal-delay-2",
+                },
+                {
+                  num: "03",
+                  title: "Analisis Deep Learning",
+                  body: "Model CNN meneliti pola sidik jari audio untuk menyimpulkan apakah suara tersebut berasal dari pita suara manusia atau dihasilkan oleh generator Text-to-Speech.",
+                  tag: "Prediksi Berbasis AI",
+                  delay: "reveal-delay-3",
+                },
+              ].map((step, i, arr) => (
+                <div
+                  key={step.num}
+                  className={`reveal ${howVisible ? "reveal-visible" : ""} ${step.delay} flex gap-8`}
+                >
+                  {/* Step number + vertical connector */}
+                  <div className="flex flex-col items-center">
+                    <div className="w-12 h-12 rounded-full border-2 border-blue-600 text-blue-600
+                      font-montserrat text-sm font-black flex items-center justify-center flex-shrink-0">
+                      {step.num}
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div className="w-[2px] flex-1 bg-slate-200 my-3 min-h-[48px]" />
+                    )}
+                  </div>
+
+                  {/* Step content */}
+                  <div className="pb-12">
+                    <h3 className="font-montserrat text-xl font-bold text-slate-900 mb-3 leading-tight">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 leading-relaxed mb-4">
+                      {step.body}
+                    </p>
+                    <code className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs font-mono rounded-md">
+                      {step.tag}
+                    </code>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="w-14 h-14 bg-blue-600 text-white font-montserrat text-xl font-black rounded-full flex items-center justify-center mb-6 shadow-lg shadow-blue-600/30">2</div>
-              <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">Ekstraksi Sidik Jari</h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-5">
-                Sistem menghilangkan jeda hening pada rekaman, lalu memindai frekuensi suara untuk mengekstrak 'sidik jari' akustik yang sangat unik.
-              </p>
-              <code className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded">Pemrosesan Sinyal Suara</code>
+            {/* Right — AI illustration */}
+            <div className={`reveal ${howVisible ? "reveal-visible" : ""} reveal-delay-2
+              lg:col-span-3 hidden lg:flex items-end justify-center`}>
+              <div className="relative w-full flex items-end justify-center">
+                {/* Audio wave — background layer */}
+                <Image
+                  src="/assets/audio-wave.png"
+                  alt=""
+                  width={800}
+                  height={300}
+                  aria-hidden="true"
+                  className="absolute bottom-1/3 w-full h-auto object-contain opacity-30"
+                  priority={false}
+                />
+                {/* AI robot — full size, no scale */}
+                <Image
+                  src="/assets/ai-photo-standing.png"
+                  alt="Ilustrasi AI forensik suara"
+                  width={900}
+                  height={900}
+                  className="relative w-full h-auto"
+                  priority={false}
+                />
+                {/* Subtle fade at very bottom only */}
+                <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+              </div>
             </div>
 
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="w-14 h-14 bg-blue-600 text-white font-montserrat text-xl font-black rounded-full flex items-center justify-center mb-6 shadow-lg shadow-blue-600/30">3</div>
-              <h3 className="font-montserrat text-lg font-bold text-slate-900 mb-3">Analisis Deep Learning</h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-5">
-                Kecerdasan Buatan (AI) meneliti pola sidik jari audio tersebut untuk menyimpulkan apakah suara tersebut asli atau buatan mesin.
-              </p>
-              <code className="px-3 py-1 bg-slate-100 text-slate-600 text-xs font-mono rounded">Prediksi Berbasis AI</code>
-            </div>
           </div>
         </div>
       </section>
@@ -215,24 +340,25 @@ export default function Home() {
       SECTION 4 — CORE APP (UPLOAD)
       ───────────────────────────────────────── */}
       <section ref={analyzeRef} className="py-24 px-6 lg:px-8 max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-8 h-[2px] bg-blue-600 rounded-full"></div>
-            <span className="font-montserrat text-xs font-bold tracking-[0.22em] uppercase text-blue-600">
-              Analisis Audio
-            </span>
-            <div className="w-8 h-[2px] bg-blue-600 rounded-full"></div>
+        <div ref={uploadRef as React.RefObject<HTMLDivElement>}>
+          <div className={`reveal reveal-fade ${uploadVisible ? "reveal-visible" : ""} text-center mb-12`}>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="w-8 h-[2px] bg-blue-600 rounded-full"></div>
+              <span className="font-montserrat text-xs font-bold tracking-[0.22em] uppercase text-blue-600">
+                Analisis Audio
+              </span>
+              <div className="w-8 h-[2px] bg-blue-600 rounded-full"></div>
+            </div>
+            <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
+              Unggah dan Deteksi Sekarang
+            </h2>
+            <p className="text-slate-500">
+              Unggah file rekaman suara dan sistem akan menganalisis keasliannya
+              menggunakan forensik akustik berbasis AI.
+            </p>
           </div>
-          <h2 className="font-montserrat text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-            Unggah dan Deteksi Sekarang
-          </h2>
-          <p className="text-slate-500">
-            Unggah file rekaman suara dan sistem akan menganalisis keasliannya
-            menggunakan forensik akustik berbasis AI.
-          </p>
-        </div>
 
-        <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-slate-100 mb-12">
+          <div className={`reveal ${uploadVisible ? "reveal-visible" : ""} reveal-delay-1 bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-slate-100 mb-12`}>
           <div className="border-2 border-dashed border-slate-300 hover:border-blue-400 bg-slate-50 hover:bg-blue-50 transition-colors rounded-xl p-10 text-center flex flex-col items-center justify-center">
             <input 
               type="file" 
@@ -266,6 +392,7 @@ export default function Home() {
             </div>
           )}
         </div>
+        </div>{/* end uploadRef wrapper */}
 
         {/* ─────────────────────────────────────────
         RESULTS
@@ -375,7 +502,10 @@ export default function Home() {
       ───────────────────────────────────────── */}
       <section className="py-16 bg-amber-50/50 border-t border-amber-100">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="bg-amber-100/50 border border-amber-200 rounded-2xl p-8 md:p-10">
+          <div
+            ref={disclaimerRef as React.RefObject<HTMLDivElement>}
+            className={`reveal ${disclaimerVisible ? "reveal-visible" : ""} bg-amber-100/50 border border-amber-200 rounded-2xl p-8 md:p-10`}
+          >
             <h4 className="font-montserrat text-xs font-bold text-amber-800 uppercase tracking-widest mb-4">
               Pernyataan Lingkup & Batasan
             </h4>
@@ -385,14 +515,23 @@ export default function Home() {
               dengan keandalan tinggi dan akurasi yang terukur.
             </p>
             <div className="flex flex-wrap gap-3">
-              <span className="px-3 py-1 bg-green-100 border border-green-200 text-green-800 rounded-full font-montserrat text-[0.65rem] font-bold tracking-wider uppercase">
-                ✅ Mendukung Deteksi Generator AI
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-100 border border-green-200 text-green-800 rounded-full font-montserrat text-[0.65rem] font-bold tracking-wider uppercase">
+                <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Mendukung Deteksi Generator AI
               </span>
-              <span className="px-3 py-1 bg-red-100 border border-red-200 text-red-800 rounded-full font-montserrat text-[0.65rem] font-bold tracking-wider uppercase">
-                ❌ Tidak untuk Voice-to-Voice (RVC)
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 border border-red-200 text-red-800 rounded-full font-montserrat text-[0.65rem] font-bold tracking-wider uppercase">
+                <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Tidak untuk Voice-to-Voice (RVC)
               </span>
-              <span className="px-3 py-1 bg-red-100 border border-red-200 text-red-800 rounded-full font-montserrat text-[0.65rem] font-bold tracking-wider uppercase">
-                ❌ Hindari Noise Berat
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-100 border border-red-200 text-red-800 rounded-full font-montserrat text-[0.65rem] font-bold tracking-wider uppercase">
+                <svg className="w-3 h-3 flex-shrink-0" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Hindari Noise Berat
               </span>
             </div>
           </div>
@@ -403,8 +542,8 @@ export default function Home() {
       SECTION 6 — FOOTER
       ───────────────────────────────────────── */}
       <footer className="bg-slate-900 text-slate-400 py-16 px-6 lg:px-8 border-t border-slate-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+        <div ref={footerRef as React.RefObject<HTMLDivElement>} className="max-w-7xl mx-auto">
+          <div className={`reveal reveal-fade ${footerVisible ? "reveal-visible" : ""} grid grid-cols-1 md:grid-cols-3 gap-12 mb-12`}>
             <div className="col-span-1 md:col-span-2">
               <div className="font-montserrat text-lg font-black text-white tracking-widest uppercase mb-3">
                 VoiceGuard.
@@ -428,7 +567,7 @@ export default function Home() {
           
           <div className="h-[1px] w-full bg-slate-800 mb-8"></div>
           
-          <div className="flex flex-col md:flex-row justify-between items-center text-xs text-slate-500">
+          <div className={`reveal reveal-fade ${footerVisible ? "reveal-visible" : ""} reveal-delay-2 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500`}>
             <p>&copy; {new Date().getFullYear()} VoiceGuard. Hak Cipta Dilindungi.</p>
             <div className="flex gap-6 mt-4 md:mt-0">
               <a href="#" className="hover:text-white transition-colors">Dokumentasi</a>

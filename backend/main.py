@@ -17,20 +17,26 @@ from backend.inference import VoiceCloningDetector
 
 app = FastAPI(title="VoiceGuard API")
 
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "*").split(",")
+    if origin.strip()
+]
+
 # Setup CORS to allow Next.js frontend to communicate
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # For production, restrict to Vercel domain
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Load Model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "model", "lcnn_model.keras")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "model", "cnn_model.keras")
 try:
     detector = VoiceCloningDetector(MODEL_PATH)
-    print("[SUCCESS] Model LCNN loaded successfully.")
+    print("[SUCCESS] Model CNN loaded successfully.")
 except Exception as e:
     detector = None
     print(f"[ERROR] Error loading model: {e}")
@@ -128,7 +134,7 @@ def read_root():
 @app.post("/api/analyze")
 async def analyze_audio(file: UploadFile = File(...)):
     if detector is None:
-        raise HTTPException(status_code=500, detail="Model gagal dimuat. Periksa file lcnn_model.keras.")
+        raise HTTPException(status_code=500, detail="Model gagal dimuat. Periksa file cnn_model.keras.")
 
     # Save uploaded file to temp
     tmp_path = f"temp_{file.filename}"

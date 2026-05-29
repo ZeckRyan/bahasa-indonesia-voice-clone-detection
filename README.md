@@ -76,6 +76,23 @@ The user interface will be accessible at `http://localhost:3000`.
 
 The code used to train the acoustic forensic model is located in the `notebooks/` directory. You can upload the Jupyter Notebook (`.ipynb`) found inside this folder directly to Google Colab to train the model using GPU acceleration. After completing the training process, download the resulting `.keras` file and place it in the `backend/model/` directory.
 
+## Deployment Notes
+
+The `.kiro/` folder is local project metadata and planning data. It is not part of the app runtime, so you do not deploy it to Vercel.
+
+For Vercel, deploy only the Next.js frontend from the `frontend/` folder. The Python FastAPI backend should be deployed separately, for example to Render, Railway, Fly.io, or another Python host. After that, set `NEXT_PUBLIC_API_BASE_URL` in Vercel to the backend URL.
+
+For Render, deploy the repository root using the included `render.yaml`. Set `CORS_ORIGINS` in Render to your Vercel domain, for example `https://your-app.vercel.app`.
+
+Example for local development:
+
+```bash
+# frontend/.env.local
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
+
+In Vercel, set the same variable to your production backend URL, for example `https://your-backend.onrender.com`.
+
 ## Limitations and Scope
 
 - The model is optimized for detecting Text-to-Speech (TTS) cloning algorithms.
