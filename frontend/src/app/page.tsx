@@ -75,7 +75,7 @@ export default function Home() {
         {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/assets/hero.png')" }}
+          style={{ backgroundImage: "url('/assets/hero.webp')" }}
         />
         {/* Dark Overlay Gradient (Darker on the right) */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#04081833] via-[#040818ad] to-[#040818fa]" />
@@ -310,7 +310,7 @@ export default function Home() {
               <div className="relative w-full flex items-end justify-center">
                 {/* Audio wave — background layer */}
                 <Image
-                  src="/assets/audio-wave.png"
+                  src="/assets/audio-wave.webp"
                   alt=""
                   width={800}
                   height={300}
@@ -320,7 +320,7 @@ export default function Home() {
                 />
                 {/* AI robot — full size, no scale */}
                 <Image
-                  src="/assets/ai-photo-standing.png"
+                  src="/assets/ai-photo-standing.webp"
                   alt="Ilustrasi AI forensik suara"
                   width={900}
                   height={900}
